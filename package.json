@@ -1,0 +1,35 @@
+{
+  "name": "angular-gulp-scratch",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "postinstall": "bower install"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.17.0",
+    "del": "^2.2.2",
+    "event-stream": "^3.3.4",
+    "gulp": "^3.9.1",
+    "gulp-angular-filesort": "^1.1.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-htmlhint": "^0.3.1",
+    "gulp-inject": "^4.1.0",
+    "gulp-jshint": "^2.0.1",
+    "gulp-load-plugins": "^1.3.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-ng-html2js": "^0.2.2",
+    "gulp-order": "^1.1.1",
+    "gulp-print": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^2.0.0",
+    "gulp-watch": "^4.3.10",
+    "jshint-stylish": "^2.2.1",
+    "main-bower-files": "^2.13.1",
+    "q": "^1.4.1",
+    "rimraf": "^2.5.4"
+  }
+}
