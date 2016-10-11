@@ -1,3 +1,4 @@
 .hello {
-    color: blue;
+    color: #000;
+    font-weight: bold !important;
 }

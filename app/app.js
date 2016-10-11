@@ -13,11 +13,11 @@ var app = angular.module('app', [
     $stateProvider
         .state('404', {
             url: '/404',
-            templateUrl: 'components/404/404.html'
+            templateUrl: './components/404/404.html'
         })
 	    .state('hello', {
 	    	url: '/hello',
             controller: 'HelloController',
-            templateUrl: 'components/hello/hello.html'
+            templateUrl: './components/hello/hello.html'
         });
 }]);

@@ -44,7 +44,7 @@ pipes.appScriptsDev = function() {
 pipes.appScriptsProd = function() {
     return gulp.src(path.scripts)
         // .pipe(pipes.partialsProd())
-        .pipe(_p.angularFilesort())
+        // .pipe(_p.angularFilesort())
         .pipe(_p.concat('app.min.js'))
         .pipe(_p.uglify())
         .pipe(gulp.dest('dist.prod/js'));
@@ -87,8 +87,8 @@ pipes.partialsProd = function() {
         .pipe(_p.htmlmin({collapseWhitespace: true, removeComments: true}))
         .pipe(_p.ngHtml2js({
             // base: "app",
-            moduleName: "app"
-            // prefix: "/components"
+            moduleName: "app",
+            prefix: "./"
         }))
         .pipe(_p.concat('partials.min.js'))
         .pipe(_p.uglify())
@@ -113,7 +113,7 @@ pipes.indexProd = function() {
         .pipe(_p.inject(pipes.appScriptsProd(), {relative: true}))
         .pipe(_p.inject(pipes.vendorStylesProd(), {relative: true, name: 'bower'}))
         .pipe(_p.inject(pipes.appStylesProd(), {relative: true}))
-        // .pipe(_p.htmlmin({collapseWhitespace: true, removeComments: true}))
+        .pipe(_p.htmlmin({collapseWhitespace: true, removeComments: true}))
         .pipe(gulp.dest('./dist.prod'));
 };
 
@@ -130,7 +130,6 @@ pipes.imagesProd = function() {
 pipes.cleanDev = function() {
     return del('dist.dev');
 };
-
 
 pipes.cleanProd = function() {
     return del('dist.prod');
@@ -153,11 +152,17 @@ gulp.task('build-partials-dev', pipes.partialsDev);
 gulp.task('build-partials-prod', pipes.partialsProd);
 
 gulp.task('build-images-dev', pipes.imagesDev);
+gulp.task('build-images-prod', pipes.imagesProd);
 
 gulp.task('build-dev', gulp.series('clean-dev', gulp.parallel(
     'build-index-dev',
     'build-partials-dev',
     'build-images-dev'
+)));
+
+gulp.task('build-prod', gulp.series('clean-prod', gulp.parallel(
+    'build-index-prod',
+    'build-images-prod'
 )));
 
 gulp.task('watch-dev', gulp.series('build-dev', function() {
@@ -191,9 +196,53 @@ gulp.task('watch-dev', gulp.series('build-dev', function() {
         return pipes.vendorScriptsDev()
             .pipe(browserSync.reload({stream: true}));
     });
+
+    //watch images
+    _p.watch(path.images, function() {
+        return pipes.imagesDev()
+            .pipe(browserSync.reload({stream: true}));
+    });
 }));
 
-gulp.task('serve', function() {
+gulp.task('watch-prod', gulp.series('build-prod', function() {
+
+    //watch index
+    _p.watch(path.index, function() {
+        return pipes.indexProd()
+        .pipe(browserSync.reload({stream: true}));
+    });
+
+    //wath app scripts
+    _p.watch(path.scripts, function() {
+        return pipes.appScriptsProd()
+            .pipe(browserSync.reload({stream: true}));
+    });
+
+    //wath html partials
+    _p.watch(path.partials, function() {
+        return pipes.partialsProd()
+            .pipe(browserSync.reload({stream: true}));
+    });
+
+    //watch styles
+    _p.watch(path.styles, function() {
+        return pipes.appStylesProd()
+            .pipe(browserSync.reload({stream: true}));
+    });
+
+    //watch vendor scripts
+    _p.watch(bowerFiles(), function() {
+        return pipes.vendorScriptsProd()
+            .pipe(browserSync.reload({stream: true}));
+    });
+
+    _p.watch(path.images, function() {
+        return pipes.imagesProd()
+            .pipe(browserSync.reload({stream: true}));
+    });
+}));
+
+gulp.task('serve-dev', function() {
     browserSync.init({
         server: 'dist.dev'
     });
@@ -201,6 +250,16 @@ gulp.task('serve', function() {
     // browserSync.watch('dist.dev/**/*.*').on('change', browserSync.reload);
 });
 
+gulp.task('serve-prod', function() {
+    browserSync.init({
+        server: 'dist.prod'
+    });
+});
+
 gulp.task('dev',
-    gulp.series('build-dev', gulp.parallel('watch-dev', 'serve'))
+    gulp.series('build-dev', gulp.parallel('watch-dev', 'serve-dev'))
+);
+
+gulp.task('prod',
+    gulp.series('build-prod', gulp.parallel('watch-prod', 'serve-prod'))
 );
