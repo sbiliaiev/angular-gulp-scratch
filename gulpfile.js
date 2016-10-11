@@ -49,8 +49,10 @@ pipes.appScriptsProd = function() {
         // .pipe(_p.angularFilesort())
         .pipe(_p.jshint())
         .pipe(_p.jshint.reporter('jshint-stylish'))
+        .pipe(_p.sourcemaps.init())
         .pipe(_p.concat('app.min.js'))
         .pipe(_p.uglify())
+        .pipe(_p.sourcemaps.write())
         .pipe(gulp.dest('dist.prod/js'));
 };
 
@@ -102,8 +104,10 @@ pipes.partialsProd = function() {
             moduleName: "app.partials",
             prefix: "./"
         }))
+        .pipe(_p.sourcemaps.init())
         .pipe(_p.concat('partials.min.js'))
         .pipe(_p.uglify())
+        .pipe(_p.sourcemaps.write())
         .pipe(gulp.dest('dist.prod/js'));
 };
 
