@@ -37,6 +37,8 @@ pipes.vendorScriptsProd = function() {
 
 pipes.appScriptsDev = function() {
     return gulp.src(path.scripts)
+        .pipe(_p.jshint())
+        .pipe(_p.jshint.reporter('jshint-stylish'))
         .pipe(gulp.dest('dist.dev'))
         .pipe(_p.angularFilesort());
 };
@@ -45,6 +47,8 @@ pipes.appScriptsProd = function() {
     return gulp.src(path.scripts)
         // .pipe(pipes.partialsProd())
         // .pipe(_p.angularFilesort())
+        .pipe(_p.jshint())
+        .pipe(_p.jshint.reporter('jshint-stylish'))
         .pipe(_p.concat('app.min.js'))
         .pipe(_p.uglify())
         .pipe(gulp.dest('dist.prod/js'));
@@ -66,28 +70,36 @@ pipes.vendorStylesProd = function() {
 pipes.appStylesDev = function() {
     return gulp.src(path.styles)
         .pipe(_p.sass())
+        .pipe(_p.autoprefixer())
         .pipe(gulp.dest('dist.dev/'));
 };
 
 pipes.appStylesProd = function() {
     return gulp.src(path.styles)
+        .pipe(_p.sourcemaps.init())
         .pipe(_p.sass())
+        .pipe(_p.autoprefixer())
         .pipe(_p.concat('style.min.css'))
         .pipe(_p.minifyCss())
+        .pipe(_p.sourcemaps.write())
         .pipe(gulp.dest('dist.prod/css'));
 };
 
 pipes.partialsDev = function() {
     return gulp.src(path.partials)
+        .pipe(_p.htmlhint({'doctype-first': false}))
+        .pipe(_p.htmlhint.reporter())
         .pipe(gulp.dest('./dist.dev'));
 };
 
 pipes.partialsProd = function() {
     return gulp.src(path.partials)
+        .pipe(_p.htmlhint({'doctype-first': false}))
+        .pipe(_p.htmlhint.reporter())
         .pipe(_p.htmlmin({collapseWhitespace: true, removeComments: true}))
         .pipe(_p.ngHtml2js({
             // base: "app",
-            moduleName: "app",
+            moduleName: "app.partials",
             prefix: "./"
         }))
         .pipe(_p.concat('partials.min.js'))
@@ -97,6 +109,8 @@ pipes.partialsProd = function() {
 
 pipes.indexDev = function() {
     return gulp.src(path.index)
+        .pipe(_p.htmlhint())
+        .pipe(_p.htmlhint.reporter())
         .pipe(gulp.dest('dist.dev'))
         .pipe(_p.inject(pipes.vendorScriptsDev(), {relative: true, name: 'bower'}))
         .pipe(_p.inject(pipes.appScriptsDev(), {relative: true}))
@@ -107,6 +121,8 @@ pipes.indexDev = function() {
 
 pipes.indexProd = function() {
     return gulp.src(path.index)
+        .pipe(_p.htmlhint())
+        .pipe(_p.htmlhint.reporter())
         .pipe(gulp.dest('./dist.prod'))
         .pipe(_p.inject(pipes.vendorScriptsProd(), {relative: true, name: 'bower'}))
         .pipe(_p.inject(pipes.partialsProd(), {relative: true, name: 'partials'}))
@@ -137,15 +153,19 @@ pipes.cleanProd = function() {
 
 // === _TASKS_ ===
 gulp.task('clean-dev', pipes.cleanDev);
-
 gulp.task('clean-prod', pipes.cleanProd);
 
-gulp.task('build-index-dev', pipes.indexDev);
+gulp.task('build-vendor-scripts-dev', pipes.vendorScriptsDev);
+gulp.task('build-app-scripts-dev', pipes.appScriptsDev);
+gulp.task('build-vendor-styles-dev', pipes.vendorStylesDev);
+gulp.task('build-app-styles-dev', pipes.appStylesDev);
 
 gulp.task('build-vendor-scripts-prod', pipes.vendorScriptsProd);
 gulp.task('build-app-scripts-prod', pipes.appScriptsProd);
 gulp.task('build-vendor-styles-prod', pipes.vendorStylesProd);
 gulp.task('build-app-styles-prod', pipes.appStylesProd);
+
+gulp.task('build-index-dev', pipes.indexDev);
 gulp.task('build-index-prod', pipes.indexProd);
 
 gulp.task('build-partials-dev', pipes.partialsDev);
@@ -246,8 +266,6 @@ gulp.task('serve-dev', function() {
     browserSync.init({
         server: 'dist.dev'
     });
-
-    // browserSync.watch('dist.dev/**/*.*').on('change', browserSync.reload);
 });
 
 gulp.task('serve-prod', function() {

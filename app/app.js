@@ -1,6 +1,7 @@
 var app = angular.module('app', [
     'ui.router',
-    'hello'
+    'hello',
+    'app.partials'
 ])
 
 .controller('StartCtrl', ['$scope', function($scope) {
@@ -21,3 +22,5 @@ var app = angular.module('app', [
             templateUrl: './components/hello/hello.html'
         });
 }]);
+
+var partials = angular.module('app.partials', []);
